@@ -27,23 +27,23 @@ usage: iconvs [flags] [files ...]
 
 ### 2.2 示例
 
-转换一个文件
+转换一个文件:
 ```
 iconvs -f gbk -t utf8 gbk.txt
 ```
 
-转换多个文件
+转换多个文件:
 ```
 iconvs -f gbk -t utf8 gbk.txt a.txt
 ```
 
-转换 目录里所有文件
+转换目录里所有文件:
 ```
 iconvs -f gbk -t utf8 dir/
 ```
 
 
-转换 目录里特定文件
+转换目录里特定文件:
 ```
 iconvs -f gbk -t utf8 dir/*.c
 ```
