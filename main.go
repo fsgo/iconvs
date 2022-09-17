@@ -5,9 +5,10 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,7 +18,7 @@ import (
 	"github.com/fsgo/iconvs/convert"
 )
 
-const version = "0.1 2021-05-15"
+const version = "0.2 2022-09-17"
 
 var fromCode = flag.String("f", "", "from encoding")
 var toCode = flag.String("t", "", "to encoding")
@@ -79,7 +80,7 @@ func convertGlob(fname string) {
 		log.Fatalf("Glob(%q) failed: %v", fname, err)
 	}
 	for _, sf := range ms {
-		doConvert(sf)
+		_ = doConvert(sf)
 	}
 }
 
@@ -115,13 +116,16 @@ func doConvert(fName string) (ret error) {
 		return errIgnore
 	}
 
-	bf, err := ioutil.ReadAll(f)
+	bf, err := io.ReadAll(f)
 	if err != nil {
 		return err
 	}
-	out, err := convert.Convert(*fromCode, *toCode, bf)
+	out, err := convert.Convert(bf, *fromCode, *toCode)
 	if err != nil {
 		return err
+	}
+	if bytes.Equal(bf, out) {
+		return nil
 	}
 	if !*write {
 		fmt.Print(string(out))

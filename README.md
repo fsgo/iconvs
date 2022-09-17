@@ -4,7 +4,7 @@
 
 ## 1.安装
 ```
-go get github.com/fsgo/iconvs
+go install github.com/fsgo/iconvs@latest
 ```
 
 ## 2.使用

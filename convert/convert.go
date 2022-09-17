@@ -18,8 +18,6 @@ import (
 	"golang.org/x/text/encoding/unicode/utf32"
 )
 
-type Charset string
-
 // Encodings 支持的所有的编码
 var Encodings = map[string]encoding.Encoding{
 	"UTF-8": unicode.UTF8,
@@ -72,7 +70,8 @@ func charsetName(name string) string {
 	return a
 }
 
-func Convert(from string, to string, input []byte) ([]byte, error) {
+// Convert 转换编码
+func Convert(input []byte, from string, to string) ([]byte, error) {
 	from = charsetName(from)
 	to = charsetName(to)
 	if from == to {
