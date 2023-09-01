@@ -1,5 +1,5 @@
 module github.com/fsgo/iconvs
 
-go 1.19
+go 1.21
 
-require golang.org/x/text v0.3.7
+require golang.org/x/text v0.12.0
