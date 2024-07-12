@@ -6,23 +6,25 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
+	// "sort"
 	"sort"
 	"strings"
 
 	"github.com/fsgo/iconvs/convert"
 )
 
-const version = "0.2 2022-09-17"
+const version = "0.3 2024-07-12"
 
 var fromCode = flag.String("f", "", "from encoding")
 var toCode = flag.String("t", "", "to encoding")
-var write = flag.Bool("w", true, "write file")
+var write = flag.Bool("w", true, "write file when true, or print to stdout")
 var list = flag.Bool("l", false, "list all available encodings")
 
 func init() {
@@ -30,7 +32,7 @@ func init() {
 		cmd := os.Args[0]
 		fmt.Fprintf(os.Stderr, "usage: %s [flags] [files ...]\n", cmd)
 		flag.PrintDefaults()
-		fmt.Fprintf(os.Stderr, "\nsite :    https://github.com/fsgo/iconvs\n")
+		fmt.Fprint(os.Stderr, "\nsite :    https://github.com/fsgo/iconvs\n")
 		fmt.Fprintf(os.Stderr, "version:  %s\n", version)
 		os.Exit(2)
 	}
@@ -44,8 +46,16 @@ func main() {
 		doList()
 		return
 	}
+	if *fromCode == "" {
+		log.Fatal("-f flag is required")
+	}
+
+	if *toCode == "" {
+		log.Fatal("-t flag is required")
+	}
 
 	if *fromCode == *toCode {
+		log.Fatal("-f and -t flags cannot be combined")
 		return
 	}
 	if len(os.Args) == 0 {
@@ -66,10 +76,7 @@ func doList() {
 		names = append(names, name)
 	}
 	sort.Slice(names, func(i, j int) bool {
-		if len(names[i]) == len(names[j]) {
-			return names[i] < names[j]
-		}
-		return len(names[i]) < len(names[j])
+		return names[i] < names[j]
 	})
 	fmt.Println(strings.Join(names, "\n"))
 }
@@ -84,12 +91,12 @@ func convertGlob(fname string) {
 	}
 }
 
-var errIgnore = fmt.Errorf("ignore")
+var errIgnore = errors.New("ignore")
 var convertFail int
 
 func doConvert(fName string) (ret error) {
 	defer func() {
-		if ret == errIgnore {
+		if errors.Is(ret, errIgnore) {
 			return
 		}
 

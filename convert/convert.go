@@ -35,6 +35,9 @@ func loadAll(list []encoding.Encoding) {
 	for _, cm := range list {
 		if ss, ok := cm.(fmt.Stringer); ok {
 			name := strings.ReplaceAll(ss.String(), " ", "")
+			if name == "X-User-Defined" {
+				continue
+			}
 			Encodings[name] = cm
 		}
 	}
@@ -79,11 +82,11 @@ func Convert(input []byte, from string, to string) ([]byte, error) {
 	}
 	ic := Encodings[from]
 	if ic == nil {
-		return nil, fmt.Errorf("from encoding not support %q", from)
+		return nil, fmt.Errorf("from encoding  %q not support", from)
 	}
 	oc := Encodings[to]
 	if oc == nil {
-		return nil, fmt.Errorf("to encoding not support %q", to)
+		return nil, fmt.Errorf("to encoding %q not support", to)
 	}
 	bf, err := ic.NewDecoder().Bytes(input)
 	if err != nil {
@@ -92,7 +95,7 @@ func Convert(input []byte, from string, to string) ([]byte, error) {
 
 	out, err := oc.NewEncoder().Bytes(bf)
 	if err != nil {
-		return nil, fmt.Errorf("encode to %s failed, %w", to, err)
+		return nil, fmt.Errorf("convert %q to %q failed, %w", from, to, err)
 	}
 	return out, nil
 }
